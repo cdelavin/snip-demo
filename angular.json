@@ -29,10 +29,8 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
-          },
-          "configurations": {
-            "production": {
+            "scripts": [],
+            "prerender": false
               "budgets": [
                 {
                   "type": "initial",

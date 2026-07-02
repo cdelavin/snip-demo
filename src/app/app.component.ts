@@ -1,6 +1,5 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpErrorResponse } from '@angular/common/http';
 import { LinksService, Link } from './links.service';
 
 @Component({
@@ -88,13 +87,13 @@ import { LinksService, Link } from './links.service';
   `,
 })
 export class AppComponent implements OnInit {
-  private svc = inject(LinksService);
-
   urlInput = '';
   submitting = signal(false);
   createdLink = signal<Link | null>(null);
   error = signal<string | null>(null);
   links = signal<Link[]>([]);
+
+  constructor(private svc: LinksService) {}
 
   ngOnInit() {
     this.loadLinks();
@@ -130,8 +129,9 @@ export class AppComponent implements OnInit {
         this.submitting.set(false);
         this.loadLinks();
       },
-      error: (err: HttpErrorResponse) => {
-        this.error.set(err.error?.error ?? 'Network error — is the backend running?');
+      error: (err: unknown) => {
+        const msg = (err instanceof Error) ? err.message : 'Network error — is the backend running?';
+        this.error.set(msg);
         this.submitting.set(false);
       },
     });

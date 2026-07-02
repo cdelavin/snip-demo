@@ -1,5 +1,5 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { from, Observable } from 'rxjs';
 
 export interface Link {
   code: string;
@@ -11,14 +11,21 @@ export interface Link {
 
 @Injectable({ providedIn: 'root' })
 export class LinksService {
-  private http = inject(HttpClient);
   private base = 'http://localhost:3000';
 
-  create(url: string) {
-    return this.http.post<Link>(`${this.base}/api/links`, { url });
+  create(url: string): Observable<Link> {
+    return from(
+      fetch(`${this.base}/api/links`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      }).then(r => r.json() as Promise<Link>)
+    );
   }
 
-  list() {
-    return this.http.get<Link[]>(`${this.base}/api/links`);
+  list(): Observable<Link[]> {
+    return from(
+      fetch(`${this.base}/api/links`).then(r => r.json() as Promise<Link[]>)
+    );
   }
 }
