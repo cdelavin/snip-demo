@@ -144,13 +144,6 @@ run('git add -A', { cwd: BUNDLE });
   if (r.status === 0) {
     process.stdout.write(r.stdout || '');
     console.log('✔ Committed bundle changes');
-    if (PUSH) {
-      // Submodule is in detached HEAD — push explicitly to the bundle branch
-      run('git push origin HEAD:bundle', { cwd: BUNDLE });
-      console.log('✔ Pushed bundle branch');
-    } else {
-      console.log('ℹ  Run with --push to push bundle branch to origin');
-    }
   } else {
     const combined = (r.stdout ?? '') + (r.stderr ?? '');
     if (/nothing to commit|nothing added to commit/i.test(combined)) {
@@ -159,6 +152,13 @@ run('git add -A', { cwd: BUNDLE });
       process.stderr.write(combined);
       process.exit(r.status ?? 1);
     }
+  }
+  if (PUSH) {
+    // Push regardless of whether a new commit was made — covers pending local commits
+    run('git push origin HEAD:bundle', { cwd: BUNDLE });
+    console.log('✔ Pushed bundle branch');
+  } else {
+    console.log('ℹ  Run with --push to push bundle branch to origin');
   }
 }
 
@@ -176,12 +176,6 @@ run('git add backend frontend cli bundle scripts/ .gitignore');
   if (r.status === 0) {
     process.stdout.write(r.stdout || '');
     console.log('✔ Committed superproject pointer update');
-    if (PUSH) {
-      run('git push origin main');
-      console.log('✔ Pushed main');
-    } else {
-      console.log('ℹ  Run with --push to push main to origin');
-    }
   } else {
     const combined = (r.stdout ?? '') + (r.stderr ?? '');
     if (/nothing to commit|nothing added to commit|no changes added to commit/i.test(combined)) {
@@ -190,6 +184,13 @@ run('git add backend frontend cli bundle scripts/ .gitignore');
       process.stderr.write(combined);
       process.exit(r.status ?? 1);
     }
+  }
+  if (PUSH) {
+    // Push regardless of whether a new commit was made — covers pending local commits
+    run('git push origin main');
+    console.log('✔ Pushed main');
+  } else {
+    console.log('ℹ  Run with --push to push main to origin');
   }
 }
 
