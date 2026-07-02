@@ -121,7 +121,7 @@ writeFileSync(
   JSON.stringify(
     {
       $schema: 'https://railway.app/railway.schema.json',
-      build:  { builder: 'DOCKERFILE' },
+      build:  { builder: 'DOCKERFILE', dockerfilePath: 'Dockerfile' },
       deploy: { restartPolicyType: 'ON_FAILURE' },
     },
     null, 2
