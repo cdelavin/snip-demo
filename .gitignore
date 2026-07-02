@@ -1,0 +1,4 @@
+# Stray Angular/Node artefacts that may land in the superproject root
+node_modules/
+dist/
+.angular/
