@@ -1,4 +1,4 @@
-import { resolve, join } from "node:path";
+import { resolve, join, sep } from "node:path";
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 
@@ -54,7 +54,8 @@ async function tryStatic(pathname) {
   const abs = resolve(join(PUBLIC_DIR, rel));
 
   // Path-traversal guard: resolved path must stay inside PUBLIC_DIR
-  if (!abs.startsWith(PUBLIC_DIR + (PUBLIC_DIR.endsWith("/") ? "" : "/"))) {
+  const guard = PUBLIC_DIR.endsWith(sep) ? PUBLIC_DIR : PUBLIC_DIR + sep;
+  if (!abs.startsWith(guard)) {
     return null;
   }
 
