@@ -1,0 +1,40 @@
+name: Build bundle
+
+# No push trigger: this file only exists on main, so a push trigger here would
+# never fire when commits land on backend / frontend / cli (different branches).
+# The hourly schedule picks those up automatically.
+on:
+  schedule:
+    - cron: '0 * * * *'   # top of every hour
+  workflow_dispatch:
+
+permissions:
+  contents: write   # required to push the assembled bundle and bump main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0   # full history so git push works from inside submodules
+
+      - name: Configure git identity and credentials
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          # Rewrite all https://github.com/ URLs so pushes from inside submodule
+          # worktrees also carry the GITHUB_TOKEN (actions/checkout only wires the
+          # credential helper in the superproject's .git/config).
+          git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Build and push bundle
+        run: node scripts/build-bundle.mjs --push
